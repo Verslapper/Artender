@@ -1,7 +1,7 @@
 extends CanvasLayer
 
 var settings = ["Mountains", "Beach", "City", "Harbour", "Alley", "Museum"]
-var objects = ["Horse", "Couple", "Building", "Boat", "Car", "Skateboard", "Lincoln"]
+var objects = ["Horse", "People", "Building", "Boat", "Car", "Skateboard", "Lincoln"]
 var modifiers = ["Dunce Cap", "Scarf", "Censored Sticker", "Megaphone", "Sunnies", "Mayoral Sash"]
 var genders = ["male", "female", "genderfluid", "attack helicopter"]
 var introText = ["It's your first day as a bartender here!", "This is no ordinary bar, though.",
@@ -16,14 +16,20 @@ var customerAge = 0
 var customerGender = ""
 var customerRequests = ["One art, please.", "Create something delightful for me please, barkeep!",
 "Show me your world, artender.", "Make me feel something in my cold, dead heart."]
+var customerReactions = ["Thanks, I hate it.", "I don't know much about art, but I know what I like.",
+"This reminds me of my youth.", "It's like you painted my dream.",
+"I've never felt so alive!", "I want a tattoo of this!"]
 var easelMode = false
-var easelStep = 0
+var optionLeft = ""
+var optionUp = ""
+var optionRight = ""
+var selectedSetting = ""
+var selectedObject = ""
+var selectedModifier = ""
 
 func _ready():
 	$EaselHUD.layer = 0
 	randomize()
-	# Called when the node is added to the scene for the first time.
-	# Initialization here
 	pass
 
 func _process(delta):
@@ -48,6 +54,42 @@ func _process(delta):
 		else:
 			startEasel()
 	pass
+	
+	if easelMode && Input.is_action_just_pressed("ui_left"):
+		if (selectedSetting == ""):
+			selectedSetting = optionLeft
+			startEasel()
+		elif (selectedObject == ""):
+			selectedObject = optionLeft
+			startEasel()
+		elif (selectedModifier == ""):
+			selectedModifier = optionLeft
+			finishEasel()
+		pass
+	
+	if easelMode && Input.is_action_just_pressed("ui_up"):
+		if (selectedSetting == ""):
+			selectedSetting = optionUp
+			startEasel()
+		elif (selectedObject == ""):
+			selectedObject = optionUp
+			startEasel()
+		elif (selectedModifier == ""):
+			selectedModifier = optionUp
+			finishEasel()
+		pass
+	
+	if easelMode && Input.is_action_just_pressed("ui_right"):
+		if (selectedSetting == ""):
+			selectedSetting = optionRight
+			startEasel()
+		elif (selectedObject == ""):
+			selectedObject = optionRight
+			startEasel()
+		elif (selectedModifier == ""):
+			selectedModifier = optionRight
+			finishEasel()
+		pass
 
 func generateCustomer():
 	customerAge = rand_range(5,95)
@@ -67,15 +109,53 @@ func startEasel():
 	# set easel background
 	$EaselHUD.layer = 3
 	# present three options
-	var setting1 = settings[randi()%settings.size()]
-	var setting2 = settings[randi()%settings.size()]
-	while (setting2 == setting1):
-		setting2 = settings[randi()%settings.size()]
-	var setting3 = settings[randi()%settings.size()]
-	while (setting3 == setting1 || setting3 == setting2):
-		setting3 = settings[randi()%settings.size()]
+	if (selectedSetting == ""):
+		$EaselHUD/QuestionLabel.set_text("What is the setting for your piece?")
+		optionLeft = settings[randi()%settings.size()]
+		optionUp = settings[randi()%settings.size()]
+		while (optionUp == optionLeft):
+			optionUp = settings[randi()%settings.size()]
+		optionRight = settings[randi()%settings.size()]
+		while (optionRight == optionLeft || optionRight == optionUp):
+			optionRight = settings[randi()%settings.size()]
+			
+	elif (selectedObject == ""):
+		$EaselHUD/QuestionLabel.set_text("What is your centrepiece?")
+		optionLeft = objects[randi()%objects.size()]
+		optionUp = objects[randi()%objects.size()]
+		while (optionUp == optionLeft):
+			optionUp = objects[randi()%objects.size()]
+		optionRight = objects[randi()%objects.size()]
+		while (optionRight == optionLeft || optionRight == optionUp):
+			optionRight = objects[randi()%objects.size()]
+			
+	elif (selectedModifier == ""):
+		$EaselHUD/QuestionLabel.set_text("What is your finisher?")
+		optionLeft = modifiers[randi()%modifiers.size()]
+		optionUp = modifiers[randi()%modifiers.size()]
+		while (optionUp == optionLeft):
+			optionUp = modifiers[randi()%modifiers.size()]
+		optionRight = modifiers[randi()%modifiers.size()]
+		while (optionRight == optionLeft || optionRight == optionUp):
+			optionRight = modifiers[randi()%modifiers.size()]
 	
-	$EaselHUD/AnswerLeftLabel.set_text(setting1)
-	$EaselHUD/AnswerUpLabel.set_text(setting2)
-	$EaselHUD/AnswerRightLabel.set_text(setting3)
+	$EaselHUD/AnswerLeftLabel.set_text(optionLeft)
+	$EaselHUD/AnswerUpLabel.set_text(optionUp)
+	$EaselHUD/AnswerRightLabel.set_text(optionRight)
+	pass
+	
+func finishEasel():
+	$EaselHUD.layer = 0
+	# show your painting
+	# get customer reaction
+	var rand = randi()%customerReactions.size()
+	$HUD/Label.set_text(customerReactions[rand])
+	# generate and show tip
+	var tip = rand * 10 + rand + 1
+	tips += tip
+	$HUD/TipLabel.set_text("$" + str(tips))
+	easelMode = false
+	selectedSetting = ""
+	selectedObject = ""
+	selectedModifier = ""
 	pass
