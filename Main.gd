@@ -16,8 +16,11 @@ var customerAge = 0
 var customerGender = ""
 var customerRequests = ["One art, please.", "Create something delightful for me please, barkeep!",
 "Show me your world, artender.", "Make me feel something in my cold, dead heart."]
+var easelMode = false
+var easelStep = 0
 
 func _ready():
+	$EaselHUD.layer = 0
 	randomize()
 	# Called when the node is added to the scene for the first time.
 	# Initialization here
@@ -39,8 +42,11 @@ func _process(delta):
 	if Input.is_action_just_pressed("ui_accept") && introIndex >= introText.size():
 		if (customerAge == 0):
 			generateCustomer()
-		else:
+		elif easelMode == false:
 			$HUD/Label.set_text(customerRequests[randi()%customerRequests.size()])
+			easelMode = true
+		else:
+			startEasel()
 	pass
 
 func generateCustomer():
@@ -55,4 +61,21 @@ func generateCustomer():
 	$HUD/Label.set_text("A " + str(round(customerAge)) + "-year-old " + customerGender + " approaches the bar.")
 	elapsedSeconds = 0 #reset [press space to advance] prompt
 	
+	pass
+	
+func startEasel():
+	# set easel background
+	$EaselHUD.layer = 3
+	# present three options
+	var setting1 = settings[randi()%settings.size()]
+	var setting2 = settings[randi()%settings.size()]
+	while (setting2 == setting1):
+		setting2 = settings[randi()%settings.size()]
+	var setting3 = settings[randi()%settings.size()]
+	while (setting3 == setting1 || setting3 == setting2):
+		setting3 = settings[randi()%settings.size()]
+	
+	$EaselHUD/AnswerLeftLabel.set_text(setting1)
+	$EaselHUD/AnswerUpLabel.set_text(setting2)
+	$EaselHUD/AnswerRightLabel.set_text(setting3)
 	pass
