@@ -26,6 +26,8 @@ var optionRight = ""
 var selectedSetting = ""
 var selectedObject = ""
 var selectedModifier = ""
+var mountains = preload("assets/Mountains.png")
+var beach = preload("assets/Beach.png")
 
 func _ready():
 	$EaselHUD.layer = 0
@@ -90,6 +92,13 @@ func _process(delta):
 			selectedModifier = optionRight
 			finishEasel()
 		pass
+	
+	# Man, how the hell do I load images programatically?
+	if (selectedSetting != ""):
+		var spritefrompreload = Sprite.new()
+		spritefrompreload.set_texture(mountains)
+		$EaselHUD/PaintingCanvas.add_child(spritefrompreload)
+		
 
 func generateCustomer():
 	customerAge = rand_range(5,95)
@@ -108,6 +117,8 @@ func generateCustomer():
 func startEasel():
 	# set easel background
 	$EaselHUD.layer = 3
+	$EaselHUD/PaintingCanvas.layer = 1
+	$HUD/TipLabel.set_text("$" + str(tips))
 	# present three options
 	if (selectedSetting == ""):
 		$EaselHUD/QuestionLabel.set_text("What is the setting for your piece?")
@@ -146,16 +157,16 @@ func startEasel():
 	
 func finishEasel():
 	$EaselHUD.layer = 0
-	# show your painting
-	# get customer reaction
+	$EaselHUD/PaintingCanvas.layer = 0
 	var rand = randi()%customerReactions.size()
 	$HUD/Label.set_text(customerReactions[rand])
-	# generate and show tip
 	var tip = rand * 10 + rand + 1
 	tips += tip
-	$HUD/TipLabel.set_text("$" + str(tips))
+	$HUD/TipLabel.set_text("$" + str(tips) + " (+$" + str(tip) + ")")
 	easelMode = false
+	customerAge = 0
 	selectedSetting = ""
 	selectedObject = ""
 	selectedModifier = ""
+	piecesCompleted += 1
 	pass
