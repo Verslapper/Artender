@@ -1,7 +1,7 @@
 extends CanvasLayer
 
 var settings = ["Mountains", "Beach", "City", "Harbour", "Alley", "Museum"]
-var objects = ["Horse", "People", "Building", "Boat", "Car", "Skateboard", "Lincoln"]
+var objects = ["Horse", "People", "Building", "Boat", "Car", "Skateboard", "Abe Lincoln"]
 var modifiers = ["Dunce Cap", "Scarf", "Censored Sticker", "Megaphone", "Sunnies", "Mayoral Sash"]
 var genders = ["male", "female", "genderfluid", "attack helicopter"]
 var introText = ["It's your first day as a bartender here!", "This is no ordinary bar, though.",
@@ -28,9 +28,14 @@ var selectedObject = ""
 var selectedModifier = ""
 var mountains = preload("assets/Mountains.png")
 var beach = preload("assets/Beach.png")
+var fxPlayer
 
 func _ready():
 	$EaselHUD.layer = 0
+	fxPlayer = AudioStreamPlayer.new()
+	fxPlayer.stream = load("res://assets/theme.wav")
+	fxPlayer.play()
+	self.add_child(fxPlayer)
 	randomize()
 	pass
 
@@ -99,7 +104,6 @@ func _process(delta):
 		spritefrompreload.set_texture(mountains)
 		$EaselHUD/PaintingCanvas.add_child(spritefrompreload)
 		
-
 func generateCustomer():
 	customerAge = rand_range(5,95)
 	
@@ -117,7 +121,7 @@ func generateCustomer():
 func startEasel():
 	# set easel background
 	$EaselHUD.layer = 3
-	$EaselHUD/PaintingCanvas.layer = 1
+	$EaselHUD/PaintingCanvas.layer = 2
 	$HUD/TipLabel.set_text("$" + str(tips))
 	# present three options
 	if (selectedSetting == ""):
